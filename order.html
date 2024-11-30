@@ -1,0 +1,912 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>维维饺子 - 点餐</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background-color: #f5f5f5;
+            padding-bottom: 70px;
+        }
+
+        .header {
+            text-align: center;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .logo {
+            width: 100px;
+            height: 100px;
+            background-color: #ff7b7b;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 10px;
+        }
+
+        .logo-text {
+            color: white;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .menu-container {
+            padding: 20px;
+        }
+
+        .menu-item {
+            background: white;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .menu-item img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .menu-info {
+            padding: 15px;
+        }
+
+        .menu-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .menu-price {
+            color: #ff4d4f;
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .menu-description {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+
+        .quantity-control {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .quantity-btn {
+            width: 30px;
+            height: 30px;
+            border: 1px solid #ddd;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .quantity {
+            font-size: 16px;
+            min-width: 30px;
+            text-align: center;
+        }
+
+        .cart-bar {
+            position: fixed;
+            bottom: 60px;
+            left: 0;
+            right: 0;
+            background: #333;
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .cart-total {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .checkout-btn {
+            background: #ff4d4f;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .tab-bar {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            display: flex;
+            background-color: white;
+            padding: 10px 0;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+        }
+
+        .tab-item {
+            flex: 1;
+            text-align: center;
+            padding: 10px;
+            color: #666;
+            text-decoration: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: 14px;
+        }
+
+        .tab-item i {
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+
+        .tab-item.active {
+            color: #0066ff;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+        }
+
+        .modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            width: 90%;
+            max-width: 500px;
+            border-radius: 10px;
+            padding: 20px;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-title {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .close-btn {
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #333;
+        }
+
+        .form-group label.required::before {
+            content: '*';
+            color: red;
+            margin-right: 4px;
+        }
+
+        .radio-group {
+            display: flex;
+            gap: 20px;
+        }
+
+        .radio-group label {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        input[type="text"],
+        input[type="tel"],
+        input[type="datetime-local"],
+        select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        input[type="datetime-local"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            color: #333;
+        }
+
+        input[type="datetime-local"]::-webkit-datetime-edit-fields-wrapper {
+            display: none;
+        }
+
+        input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            background: transparent;
+            color: transparent;
+            cursor: pointer;
+        }
+
+        .datetime-wrapper {
+            position: relative;
+            width: 100%;
+        }
+
+        .datetime-input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            background: white;
+            cursor: pointer;
+        }
+
+        .datetime-picker {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            z-index: 1000;
+            width: 90%;
+            max-width: 360px;
+        }
+
+        .datetime-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 999;
+        }
+
+        .datetime-picker .picker-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .datetime-picker .month-year {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .datetime-picker .calendar {
+            margin-bottom: 15px;
+        }
+
+        .datetime-picker .weekdays {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .datetime-picker .days {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+        }
+
+        .datetime-picker .day {
+            padding: 8px;
+            text-align: center;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        .datetime-picker .day:hover {
+            background: #f0f0f0;
+        }
+
+        .datetime-picker .day.selected {
+            background: #0066ff;
+            color: white;
+        }
+
+        .datetime-picker .time-select {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .datetime-picker .time-select select {
+            padding: 5px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        .datetime-picker .buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .datetime-picker button {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .datetime-picker .confirm-btn {
+            background: #0066ff;
+            color: white;
+        }
+
+        .datetime-picker .cancel-btn {
+            background: #f5f5f5;
+            color: #333;
+        }
+
+        .search-box {
+            position: relative;
+            margin-bottom: 10px;
+        }
+
+        .search-box i {
+            display: none;
+        }
+
+        .search-box input {
+            padding-left: 10px;
+        }
+
+        .options-list {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 100;
+        }
+
+        .option-item {
+            padding: 10px;
+            cursor: pointer;
+        }
+
+        .option-item:hover {
+            background-color: #f5f5f5;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 12px;
+            background-color: #0066ff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        .submit-btn:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo">
+            <div class="logo-text">维维饺子</div>
+        </div>
+    </div>
+
+    <div class="menu-container">
+        <div class="menu-item">
+            <img src="图/饺子.jpg" alt="鲜肉饺子">
+            <div class="menu-info">
+                <div class="menu-title">鲜肉饺子</div>
+                <div class="menu-price">¥28.00</div>
+                <div class="menu-description">精选猪肉馅料，外皮薄韧，口感鲜美</div>
+                <div class="quantity-control">
+                    <button class="quantity-btn minus">-</button>
+                    <span class="quantity">0</span>
+                    <button class="quantity-btn plus">+</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="menu-item">
+            <img src="图/饺子.jpg" alt="韭菜饺子">
+            <div class="menu-info">
+                <div class="menu-title">韭菜饺子</div>
+                <div class="menu-price">¥26.00</div>
+                <div class="menu-description">新鲜韭菜搭配鸡蛋，营养美味</div>
+                <div class="quantity-control">
+                    <button class="quantity-btn minus">-</button>
+                    <span class="quantity">0</span>
+                    <button class="quantity-btn plus">+</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="cart-bar" style="display: none;">
+        <div class="cart-total">总计：¥0.00</div>
+        <button class="checkout-btn">去结算</button>
+    </div>
+
+    <!-- 添加订单信息弹窗 -->
+    <div class="modal" id="orderModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">填写订单信息</div>
+                <span class="close-btn">&times;</span>
+            </div>
+            <form id="orderForm">
+                <div class="form-group">
+                    <label class="required">选择就餐方式</label>
+                    <div class="radio-group">
+                        <label>
+                            <input type="radio" name="diningMethod" value="pickup" checked>
+                            自取
+                        </label>
+                        <label>
+                            <input type="radio" name="diningMethod" value="delivery">
+                            快送
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group" id="areaGroup">
+                    <label class="required">选择区域</label>
+                    <div class="search-box">
+                        <input type="text" id="area" placeholder="请到C区22号楼取餐" readonly style="background-color: #f5f5f5;">
+                        <div class="options-list" id="areaOptions" style="display: none;">
+                            <div class="option-item" data-value="A区">A区</div>
+                            <div class="option-item" data-value="B区">B区</div>
+                            <div class="option-item" data-value="C区">C区</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="required">日期时间</label>
+                    <div class="datetime-wrapper">
+                        <input type="text" class="datetime-input" readonly placeholder="请选择">
+                        <input type="hidden" name="dateTime" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="required">手机号码</label>
+                    <input type="tel" name="phone" placeholder="请输入手机号码" required>
+                </div>
+
+                <button type="submit" class="submit-btn">确认下单</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="datetime-overlay"></div>
+    <div class="datetime-picker">
+        <div class="picker-header">
+            <button class="prev-month">&lt;</button>
+            <span class="month-year"></span>
+            <button class="next-month">&gt;</button>
+        </div>
+        <div class="calendar">
+            <div class="weekdays">
+                <div>日</div><div>一</div><div>二</div><div>三</div>
+                <div>四</div><div>五</div><div>六</div>
+            </div>
+            <div class="days"></div>
+        </div>
+        <div class="time-select">
+            <select class="hour-select"></select>
+            <span>:</span>
+            <select class="minute-select"></select>
+        </div>
+        <div class="buttons">
+            <button class="cancel-btn">取消</button>
+            <button class="confirm-btn">确认</button>
+        </div>
+    </div>
+
+    <div class="tab-bar">
+        <a href="index.html" class="tab-item">
+            <i class="fas fa-home"></i>
+            首页
+        </a>
+        <a href="order.html" class="tab-item active">
+            <i class="fas fa-utensils"></i>
+            点餐
+        </a>
+        <a href="order-detail.html" class="tab-item">
+            <i class="fas fa-user"></i>
+            我的饺子
+        </a>
+    </div>
+
+    <script>
+        // 获取所有数量控制按钮
+        const minusButtons = document.querySelectorAll('.minus');
+        const plusButtons = document.querySelectorAll('.plus');
+        const quantities = document.querySelectorAll('.quantity');
+        const cartBar = document.querySelector('.cart-bar');
+        const cartTotal = document.querySelector('.cart-total');
+        const checkoutBtn = document.querySelector('.checkout-btn');
+
+        // 价格配置
+        const prices = {
+            '鲜肉饺子': 28.00,
+            '韭菜饺子': 26.00
+        };
+
+        // 更新购物车总额
+        function updateTotal() {
+            let total = 0;
+            quantities.forEach((quantity, index) => {
+                const count = parseInt(quantity.textContent);
+                const price = Object.values(prices)[index];
+                total += count * price;
+            });
+
+            if (total > 0) {
+                cartBar.style.display = 'flex';
+                cartTotal.textContent = `总计：¥${total.toFixed(2)}`;
+            } else {
+                cartBar.style.display = 'none';
+            }
+        }
+
+        // 添加点击事件
+        plusButtons.forEach((btn, index) => {
+            btn.addEventListener('click', () => {
+                const currentValue = parseInt(quantities[index].textContent);
+                quantities[index].textContent = currentValue + 1;
+                updateTotal();
+            });
+        });
+
+        minusButtons.forEach((btn, index) => {
+            btn.addEventListener('click', () => {
+                const currentValue = parseInt(quantities[index].textContent);
+                if (currentValue > 0) {
+                    quantities[index].textContent = currentValue - 1;
+                    updateTotal();
+                }
+            });
+        });
+
+        // 结算按钮点击事件修改为显示弹窗
+        checkoutBtn.addEventListener('click', () => {
+            document.getElementById('orderModal').style.display = 'block';
+        });
+
+        // 关闭弹窗
+        document.querySelector('.close-btn').addEventListener('click', () => {
+            document.getElementById('orderModal').style.display = 'none';
+        });
+
+        // 处理就餐方式切换
+        const diningMethodInputs = document.querySelectorAll('input[name="diningMethod"]');
+        const areaInput = document.getElementById('area');
+        const areaOptions = document.getElementById('areaOptions');
+        const areaGroup = document.getElementById('areaGroup');
+
+        diningMethodInputs.forEach(input => {
+            input.addEventListener('change', function() {
+                if (this.value === 'pickup') {
+                    // 自取模式
+                    areaInput.value = '请到C区22号楼取餐';
+                    areaInput.placeholder = '请到C区22号楼取餐';
+                    areaInput.readOnly = true;
+                    areaInput.style.backgroundColor = '#f5f5f5';
+                    areaOptions.style.display = 'none';
+                    // 移除点击事件
+                    areaInput.onclick = null;
+                } else {
+                    // 快送模式
+                    areaInput.value = '';
+                    areaInput.placeholder = '请选择配送区域';
+                    areaInput.readOnly = false;
+                    areaInput.style.backgroundColor = 'white';
+                    // 添加点击事件显示选项
+                    areaInput.onclick = function() {
+                        areaOptions.style.display = 'block';
+                    };
+                }
+            });
+        });
+
+        // 区域选择处理
+        document.querySelectorAll('.option-item').forEach(option => {
+            option.addEventListener('click', function() {
+                if (document.querySelector('input[name="diningMethod"]:checked').value === 'delivery') {
+                    areaInput.value = this.dataset.value;
+                    areaOptions.style.display = 'none';
+                }
+            });
+        });
+
+        // 点击其他地方关闭区域选择
+        document.addEventListener('click', function(e) {
+            if (!areaGroup.contains(e.target)) {
+                areaOptions.style.display = 'none';
+            }
+        });
+
+        // 初始化时设置自取模式的显示
+        areaInput.value = 'C区22号楼';
+        areaInput.placeholder = '请到C区22号楼取餐';
+        areaInput.readOnly = true;
+        areaInput.style.backgroundColor = '#f5f5f5';
+        areaOptions.style.display = 'none';
+
+        // 提交订单
+        document.querySelector('.submit-btn').addEventListener('click', async function(event) {
+            // 阻止默认提交行为
+            event.preventDefault();
+            
+            const phone = document.querySelector('input[name="phone"]').value;
+            const address = document.getElementById('area').value;
+            const datetime = document.querySelector('input[name="dateTime"]').value;
+            const diningMethod = document.querySelector('input[name="diningMethod"]:checked').value;
+            
+            if (!phone || !address || !datetime) {
+                alert('请填写完整信息');
+                return;
+            }
+
+            // 验证手机号
+            if (!/^1[3-9]\d{9}$/.test(phone)) {
+                alert('请输入正确的手机号码');
+                return;
+            }
+
+            // 检查购物车是否为空并收集订单项
+            let hasItems = false;
+            let totalAmount = 0;
+            const orderItems = [];
+            const quantities = document.querySelectorAll('.quantity');
+            const menuItems = document.querySelectorAll('.menu-item');
+            
+            menuItems.forEach((item, index) => {
+                const quantity = parseInt(quantities[index].textContent);
+                if (quantity > 0) {
+                    hasItems = true;
+                    const price = parseFloat(item.querySelector('.menu-price').textContent.replace('¥', ''));
+                    totalAmount += quantity * price;
+                    
+                    orderItems.push({
+                        item_name: item.querySelector('.menu-title').textContent,
+                        quantity: quantity,
+                        price: price,
+                        subtotal: quantity * price
+                    });
+                }
+            });
+
+            if (!hasItems) {
+                alert('请选择至少一个商品');
+                return;
+            }
+
+            // 准备订单数据
+            const orderData = {
+                phone: phone,
+                address: address,
+                order_time: datetime,
+                dining_method: diningMethod,
+                items: orderItems.map(item => ({
+                    item_name: item.item_name,
+                    quantity: item.quantity,
+                    price: item.price
+                })),
+                total_amount: totalAmount
+            };
+
+            try {
+                // 发送订单数据到服务器
+                const response = await fetch('http://localhost:3001/api/orders', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(orderData)
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    // 保存订单号到本地存储
+                    localStorage.setItem('currentOrderNumber', result.orderNumber);
+                    // 跳转到支付页面
+                    window.location.href = `/payment.html?orderNumber=${result.orderNumber}`;
+                } else {
+                    throw new Error(result.message);
+                }
+            } catch (error) {
+                console.error('提交订单失败:', error);
+                alert('提交订单失败，请稍后重试');
+            }
+        });
+
+        // 日期时间选择器
+        const datetimeInput = document.querySelector('.datetime-input');
+        const datetimeHidden = document.querySelector('input[name="dateTime"]');
+        const datetimePicker = document.querySelector('.datetime-picker');
+        const datetimeOverlay = document.querySelector('.datetime-overlay');
+        const monthYearDisplay = document.querySelector('.month-year');
+        const daysContainer = document.querySelector('.days');
+        const hourSelect = document.querySelector('.hour-select');
+        const minuteSelect = document.querySelector('.minute-select');
+        const prevMonthBtn = document.querySelector('.prev-month');
+        const nextMonthBtn = document.querySelector('.next-month');
+        const confirmBtn = document.querySelector('.confirm-btn');
+        const cancelBtn = document.querySelector('.cancel-btn');
+
+        let currentDate = new Date();
+        let selectedDate = null;
+
+        // 初始化小时和分钟选择器
+        for (let i = 0; i < 24; i++) {
+            const option = document.createElement('option');
+            option.value = i.toString().padStart(2, '0');
+            option.textContent = i.toString().padStart(2, '0');
+            hourSelect.appendChild(option);
+        }
+
+        for (let i = 0; i < 60; i++) {
+            const option = document.createElement('option');
+            option.value = i.toString().padStart(2, '0');
+            option.textContent = i.toString().padStart(2, '0');
+            minuteSelect.appendChild(option);
+        }
+
+        function updateCalendar() {
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth();
+            const firstDay = new Date(year, month, 1);
+            const lastDay = new Date(year, month + 1, 0);
+            const startingDay = firstDay.getDay();
+            
+            monthYearDisplay.textContent = `${year}年${month + 1}月`;
+            
+            let daysHtml = '';
+            for (let i = 0; i < startingDay; i++) {
+                daysHtml += '<div></div>';
+            }
+            
+            for (let day = 1; day <= lastDay.getDate(); day++) {
+                const date = new Date(year, month, day);
+                const isSelected = selectedDate && 
+                    date.getDate() === selectedDate.getDate() &&
+                    date.getMonth() === selectedDate.getMonth() &&
+                    date.getFullYear() === selectedDate.getFullYear();
+                
+                daysHtml += `<div class="day${isSelected ? ' selected' : ''}">${day}</div>`;
+            }
+            
+            daysContainer.innerHTML = daysHtml;
+            
+            // 添加日期点击事件
+            document.querySelectorAll('.day').forEach(dayElement => {
+                dayElement.addEventListener('click', () => {
+                    document.querySelectorAll('.day').forEach(d => d.classList.remove('selected'));
+                    dayElement.classList.add('selected');
+                    selectedDate = new Date(year, month, parseInt(dayElement.textContent));
+                });
+            });
+        }
+
+        datetimeInput.addEventListener('click', () => {
+            datetimePicker.style.display = 'block';
+            datetimeOverlay.style.display = 'block';
+            if (!selectedDate) {
+                selectedDate = new Date();
+                hourSelect.value = selectedDate.getHours().toString().padStart(2, '0');
+                minuteSelect.value = selectedDate.getMinutes().toString().padStart(2, '0');
+            }
+            updateCalendar();
+        });
+
+        prevMonthBtn.addEventListener('click', () => {
+            currentDate.setMonth(currentDate.getMonth() - 1);
+            updateCalendar();
+        });
+
+        nextMonthBtn.addEventListener('click', () => {
+            currentDate.setMonth(currentDate.getMonth() + 1);
+            updateCalendar();
+        });
+
+        confirmBtn.addEventListener('click', () => {
+            if (selectedDate) {
+                selectedDate.setHours(parseInt(hourSelect.value));
+                selectedDate.setMinutes(parseInt(minuteSelect.value));
+                
+                const formattedDate = `${selectedDate.getFullYear()}-${(selectedDate.getMonth() + 1).toString().padStart(2, '0')}-${selectedDate.getDate().toString().padStart(2, '0')}`;
+                const formattedTime = `${hourSelect.value}:${minuteSelect.value}`;
+                
+                datetimeInput.value = `${formattedDate} ${formattedTime}`;
+                datetimeHidden.value = `${formattedDate}T${formattedTime}`;
+            }
+            datetimePicker.style.display = 'none';
+            datetimeOverlay.style.display = 'none';
+        });
+
+        cancelBtn.addEventListener('click', () => {
+            datetimePicker.style.display = 'none';
+            datetimeOverlay.style.display = 'none';
+        });
+
+        datetimeOverlay.addEventListener('click', () => {
+            datetimePicker.style.display = 'none';
+            datetimeOverlay.style.display = 'none';
+        });
+
+        function calculateTotal() {
+            let total = 0;
+            quantities.forEach((quantity, index) => {
+                const count = parseInt(quantity.textContent);
+                const price = Object.values(prices)[index];
+                total += count * price;
+            });
+            return total.toFixed(2);
+        }
+    </script>
+</body>
+</html>

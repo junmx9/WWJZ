@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>订单详情 - 维维饺子</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            padding-bottom: 70px;
+        }
+
+        .order-header {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .order-header h1 {
+            font-size: 20px;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .order-status {
+            display: inline-block;
+            padding: 5px 10px;
+            color: white;
+            border-radius: 15px;
+            font-size: 14px;
+        }
+
+        .order-status.待支付 {
+            background: #ff9800;
+        }
+
+        .order-status.待处理 {
+            background: #2196F3;
+            transition: all 0.3s ease;
+        }
+
+        .order-status.待处理:hover {
+            background: #1976D2;
+            transform: scale(1.05);
+        }
+
+        .order-status.已完成 {
+            background: #4CAF50;
+        }
+
+        .order-status.已取消 {
+            background: #9E9E9E;
+        }
+
+        .order-info {
+            padding: 20px;
+        }
+
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .info-item:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            color: #666;
+        }
+
+        .info-value {
+            color: #333;
+            font-weight: 500;
+        }
+
+        .order-items {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .item-list {
+            margin-top: 10px;
+        }
+
+        .item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .item:last-child {
+            border-bottom: none;
+        }
+
+        .item-info {
+            display: flex;
+            align-items: center;
+        }
+
+        .item-name {
+            flex: 1;
+        }
+
+        .item-quantity {
+            color: #666;
+            margin: 0 20px;
+        }
+
+        .item-price {
+            color: #ff7b7b;
+        }
+
+        .total-amount {
+            text-align: right;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .pay-button {
+            display: none;
+            width: 100%;
+            padding: 12px;
+            background: #ff9800;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            margin-top: 20px;
+            cursor: pointer;
+        }
+
+        .pay-button:hover {
+            background: #f57c00;
+        }
+
+        .tab-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0;
+            box-shadow: 0 -2px 5px rgba(0,0,0,0.1);
+        }
+
+        .tab-item {
+            text-decoration: none;
+            color: #666;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: 12px;
+        }
+
+        .tab-item i {
+            font-size: 20px;
+            margin-bottom: 5px;
+        }
+
+        .tab-item.active {
+            color: #0066ff;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="order-header">
+            <h1>订单详情</h1>
+            <div class="order-info">
+                <div class="info-item">
+                    <span class="info-label">订单号</span>
+                    <span class="info-value" id="orderNumber">-</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">订单状态</span>
+                    <span class="order-status" id="orderStatus">-</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">下单时间</span>
+                    <span class="info-value" id="orderTime">-</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">取餐方式</span>
+                    <span class="info-value" id="diningMethod">-</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">取餐地址</span>
+                    <span class="info-value" id="area">-</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">联系电话</span>
+                    <span class="info-value" id="phone">-</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="order-items">
+            <h2>订单内容</h2>
+            <div class="item-list" id="itemList">
+                <!-- 订单项将通过JavaScript动态添加 -->
+            </div>
+            <div class="total-amount">
+                总计：<span id="totalAmount">¥0.00</span>
+            </div>
+        </div>
+        <button class="pay-button" style="display: none;">支付</button>
+    </div>
+
+    <div class="tab-bar">
+        <a href="index.html" class="tab-item">
+            <i class="fas fa-home"></i>
+            首页
+        </a>
+        <a href="order.html" class="tab-item">
+            <i class="fas fa-utensils"></i>
+            点餐
+        </a>
+        <a href="order-detail.html" class="tab-item active">
+            <i class="fas fa-user"></i>
+            我的饺子
+        </a>
+    </div>
+
+    <script>
+        // 从后端获取订单信息
+        async function fetchOrderDetails() {
+            try {
+                const orderNumber = localStorage.getItem('currentOrderNumber');
+                if (!orderNumber) {
+                    console.error('未找到订单号');
+                    document.querySelector('.container').innerHTML = `
+                        <div class="order-header">
+                            <h1>订单详情</h1>
+                            <div class="order-info">
+                                <p style="text-align: center; padding: 20px;">未找到订单信息，请返回首页重新下单</p>
+                            </div>
+                        </div>
+                    `;
+                    return;
+                }
+
+                console.log('正在获取订单:', orderNumber);
+                const response = await fetch(`http://localhost:3001/api/orders/${orderNumber}`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const result = await response.json();
+                console.log('获取到订单数据:', result);
+
+                if (result.success) {
+                    const orderInfo = result.order;
+                    
+                    // 显示订单信息
+                    document.getElementById('orderNumber').textContent = orderInfo.order_number || '-';
+                    document.getElementById('orderTime').textContent = orderInfo.order_time ? 
+                        new Date(orderInfo.order_time).toLocaleString('zh-CN', {
+                            year: 'numeric',
+                            month: '2-digit',
+                            day: '2-digit',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                        }) : '-';
+                    
+                    // 处理就餐方式和地址显示
+                    const diningMethod = orderInfo.dining_method === 'pickup' ? '自取' : '快送';
+                    document.getElementById('diningMethod').textContent = diningMethod;
+                    
+                    // 如果是自取，显示固定地址
+                    if (orderInfo.dining_method === 'pickup') {
+                        document.getElementById('area').textContent = 'C区22号楼';
+                    } else {
+                        document.getElementById('area').textContent = orderInfo.address || '-';
+                    }
+                    
+                    document.getElementById('phone').textContent = orderInfo.phone || '-';
+                    
+                    // 更新订单状态样式
+                    const statusElement = document.getElementById('orderStatus');
+                    statusElement.textContent = orderInfo.status || '-';
+                    statusElement.className = 'order-status ' + (orderInfo.status || '').replace(/\s+/g, '-').toLowerCase();
+                    
+                    // 添加状态点击事件
+                    if (orderInfo.status === '待处理') {
+                        statusElement.style.cursor = 'pointer';
+                        statusElement.addEventListener('click', function() {
+                            // 存储当前订单号用于支付页面使用
+                            localStorage.setItem('currentOrderNumber', orderInfo.order_number);
+                            // 跳转到支付页面
+                            window.location.href = 'payment.html';
+                        });
+                    } else {
+                        statusElement.style.cursor = 'default';
+                    }
+                    
+                    // 显示订单商品
+                    const itemsContainer = document.querySelector('.item-list');
+                    itemsContainer.innerHTML = '';
+                    if (orderInfo.items && orderInfo.items.length > 0) {
+                        orderInfo.items.forEach(item => {
+                            const itemDiv = document.createElement('div');
+                            itemDiv.className = 'item';
+                            itemDiv.innerHTML = `
+                                <div class="item-info">
+                                    <span class="item-name">${item.item_name}</span>
+                                    <span class="item-quantity">x${item.quantity}</span>
+                                </div>
+                                <span class="item-price">¥${parseFloat(item.price).toFixed(2)}</span>
+                            `;
+                            itemsContainer.appendChild(itemDiv);
+                        });
+                    } else {
+                        itemsContainer.innerHTML = '<p style="text-align: center; padding: 10px;">暂无订单项目</p>';
+                    }
+                    
+                    // 显示总金额
+                    document.getElementById('totalAmount').textContent = `¥${parseFloat(orderInfo.total_amount).toFixed(2)}`;
+
+                    // 根据订单状态显示或隐藏支付按钮
+                    const payButton = document.querySelector('.pay-button');
+                    if (payButton) {
+                        payButton.style.display = orderInfo.status === '待支付' ? 'block' : 'none';
+                    }
+                } else {
+                    console.error('获取订单失败:', result.message);
+                    alert('获取订单信息失败：' + result.message);
+                }
+            } catch (error) {
+                console.error('获取订单信息失败：', error);
+                alert('获取订单信息失败，请稍后重试');
+            }
+        }
+
+        // 待支付按钮点击事件
+        document.querySelector('.pay-button').addEventListener('click', function() {
+            window.location.href = 'payment.html';
+        });
+
+        // 页面加载完成后获取订单信息
+        document.addEventListener('DOMContentLoaded', fetchOrderDetails);
+    </script>
+</body>
+</html>

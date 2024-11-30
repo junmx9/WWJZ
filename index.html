@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>维维饺子</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background-color: #f5f5f5;
+            padding-bottom: 70px; /* 添加底部内边距，为底部导航栏留出空间 */
+        }
+
+        .header {
+            text-align: center;
+            padding: 20px;
+            position: relative;
+        }
+
+        .logo {
+            width: 200px;
+            height: 200px;
+            background-color: #ff7b7b;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto;
+        }
+
+        .logo-text {
+            color: white;
+            font-size: 32px;
+            font-weight: bold;
+        }
+
+        .subtitle {
+            margin: 20px 0;
+            font-size: 24px;
+            color: #333;
+        }
+
+        .menu-grid {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            padding: 20px;
+            flex-wrap: wrap;
+        }
+
+        .menu-item {
+            width: 300px;
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .menu-item:hover {
+            transform: translateY(-5px);
+        }
+
+        .menu-item img {
+            width: 100%;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .menu-item h3 {
+            margin-top: 10px;
+            font-size: 20px;
+            color: #333;
+        }
+
+        .reserve-button {
+            display: block;
+            width: 200px;
+            margin: 30px auto;
+            padding: 15px;
+            background-color: #0066ff;
+            color: white;
+            text-align: center;
+            border-radius: 25px;
+            text-decoration: none;
+            font-size: 18px;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin-bottom: 40px; /* 增加底部按钮的下边距 */
+        }
+
+        .reserve-button:hover {
+            background-color: #0052cc;
+        }
+
+        .tab-bar {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            display: flex;
+            background-color: white;
+            padding: 10px 0;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+        }
+
+        .tab-item {
+            flex: 1;
+            text-align: center;
+            padding: 10px;
+            color: #666;
+            text-decoration: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: 14px;
+        }
+
+        .tab-item i {
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+
+        .tab-item.active {
+            color: #0066ff;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+<body>
+    <div class="header">
+        <div class="logo">
+            <div class="logo-text">维维饺子</div>
+        </div>
+        <h2 class="subtitle">鲜美饺子 提前预约</h2>
+    </div>
+
+    <div class="menu-grid">
+        <div class="menu-item">
+            <a href="order.html">
+                <img src="图/饺子.jpg" alt="鲜肉饺子">
+                <h3>鲜肉饺子</h3>
+            </a>
+        </div>
+        <div class="menu-item">
+            <a href="order.html">
+                <img src="图/饺子.jpg" alt="韭菜饺子">
+                <h3>韭菜饺子</h3>
+            </a>
+        </div>
+    </div>
+
+    <a href="reserve.html" class="reserve-button">点我预约</a>
+
+    <div class="tab-bar">
+        <a href="index.html" class="tab-item active">
+            <i class="fas fa-home"></i>
+            首页
+        </a>
+        <a href="order.html" class="tab-item">
+            <i class="fas fa-utensils"></i>
+            点餐
+        </a>
+        <a href="order-detail.html" class="tab-item">
+            <i class="fas fa-user"></i>
+            我的饺子
+        </a>
+    </div>
+</body>
+</html>
